@@ -4,9 +4,22 @@ This folder contains precomputed results from analyzing semantic change in six c
 
 ## Data Source
 
-- **Corpus**: British newspaper articles (1800s–1910s)
-- **Embeddings**: Word2Vec models trained per decade using the [Living with Machines](https://livingwithmachines.ac.uk/) pipeline
+- **Corpus**: 4.2 billion words from 19th-century British newspapers
+- **Embeddings**: Pre-trained, pre-aligned diachronic Word2Vec embeddings from [Zenodo](https://zenodo.org/records/7181682)
 - **Time span**: 1840s–1910s (8 decades)
+- **Alignment**: Vectors are pre-aligned across decades using Orthogonal Procrustes
+
+### Obtaining the Embeddings
+
+The pre-trained vectors (~2GB) are too large to include in this repository. To reproduce these results:
+
+1. Download the embeddings from Zenodo: https://zenodo.org/records/7181682
+2. Extract to a `vectors/` directory
+3. Run the scripts as shown below
+
+**Required citation for embeddings:**
+
+> Pedrazzini, Nilo & Barbara McGillivray. 2022. *Diachronic word embeddings from 19th-century British newspapers* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7181682
 
 ---
 
@@ -111,3 +124,28 @@ python visualize_semantic_trajectory.py \
 ```
 
 ---
+
+## Citation
+
+If you use this data or code, please cite:
+
+### Embeddings (required)
+
+```bibtex
+@dataset{pedrazzinimcgilli_diachemb19data,
+  author       = {Nilo Pedrazzini and
+                  Barbara McGillivray},
+  title        = {{Diachronic word embeddings from 19th-century 
+                   British newspapers}},
+  year         = 2022,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.7181682},
+  url          = {https://doi.org/10.5281/zenodo.7181682}
+}
+```
+
+## Acknowledgments
+
+- Pre-trained embeddings by [Pedrazzini & McGillivray (2022)](https://zenodo.org/records/7181682)
+- Analysis code adapted from [Living with Machines: DiachronicEmb-BigHistData](https://github.com/Living-with-machines/DiachronicEmb-BigHistData)
+- Developed as part of the TRIFECTA project at KNAW Humanities Cluster
