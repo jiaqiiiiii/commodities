@@ -111,21 +111,3 @@ python visualize_semantic_trajectory.py \
 ```
 
 ---
-
-## Citation
-
-If you use this data, please cite:
-
-```bibtex
-@software{commodity_semantic_change,
-  author = {Zhang, Jiaqi},
-  title = {Semantic Change in Colonial Commodity Terms},
-  year = {2025},
-  url = {https://github.com/YOUR_USERNAME/YOUR_REPO}
-}
-```
-
-## License
-
-Data: CC-BY 4.0  
-Code: MIT License
