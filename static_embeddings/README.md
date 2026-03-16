@@ -24,11 +24,31 @@ pip install pyspellchecker  # Filters OCR errors from historical texts
 
 ## Input Data
 
-Both scripts expect Word2Vec models in text or binary format, organized by time period:
+Both scripts expect Word2Vec models in text or binary format, organized by time period.
+
+### Pre-trained Embeddings (Recommended)
+
+We used pre-trained, pre-aligned diachronic embeddings from the Living with Machines project:
+
+**Download:** https://zenodo.org/records/7181682
+
+These embeddings were trained on a 4.2 billion word corpus of 19th-century British newspapers, divided by decade and aligned using Orthogonal Procrustes.
+
+```bash
+# Download and extract
+wget https://zenodo.org/records/7181682/files/lwm_vectors.zip
+unzip lwm_vectors.zip -d vectors/
+```
+
+**If you use these embeddings, you must cite:**
+
+> Pedrazzini, Nilo & Barbara McGillivray. 2022. *Diachronic word embeddings from 19th-century British newspapers* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7181682
+
+### Expected folder structure
 
 ```
 vectors/
-├── 1840s-vectors.txt    # or 1840s.txt, 1840s.vec, 1840s.bin
+├── 1840s-vectors.txt
 ├── 1850s-vectors.txt
 ├── 1860s-vectors.txt
 ├── 1870s-vectors.txt
@@ -42,8 +62,6 @@ vectors/
 - Word2Vec text format (`*.txt`, `*-vectors.txt`)
 - Word2Vec binary format (`*.bin`)
 - FastText vectors (`*.vec`)
-
-### Training your own embeddings
 
 ---
 
@@ -245,8 +263,34 @@ python visualize_semantic_trajectory.py --word war --decades 1914 1915 1916 1917
 
 ---
 
+## Citation
+
+If you use these tools in your research, please cite:
+
+### Pre-trained embeddings (required if using Zenodo data)
+
+```bibtex
+@dataset{pedrazzinimcgilli_diachemb19data,
+  author       = {Nilo Pedrazzini and
+                  Barbara McGillivray},
+  title        = {{Diachronic word embeddings from 19th-century 
+                   British newspapers}},
+  year         = 2022,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.7181682},
+  url          = {https://doi.org/10.5281/zenodo.7181682}
+}
+```
+
+## Related Work
+
+- [Living with Machines](https://livingwithmachines.ac.uk/) — Historical NLP project
+- [DiachronicEmb-BigHistData](https://github.com/Living-with-machines/DiachronicEmb-BigHistData) — Original codebase this work adapts
+- [HistWords](https://nlp.stanford.edu/projects/histwords/) — Hamilton et al.'s diachronic word embeddings
+- [SemEval-2020 Task 1](https://www.aclweb.org/anthology/2020.semeval-1.1/) — Unsupervised Lexical Semantic Change Detection
+
 ## Acknowledgments
 
+- Pre-trained embeddings by [Pedrazzini & McGillivray (2022)](https://zenodo.org/records/7181682)
+- Code adapted from [Living with Machines: DiachronicEmb-BigHistData](https://github.com/Living-with-machines/DiachronicEmb-BigHistData)
 - Developed as part of the TRIFECTA project at KNAW Humanities Cluster
-- Trajectory visualization adapted from the Living with Machines project
-- Word2Vec embeddings from the [LwM Semantic Change](https://github.com/Living-with-machines) pipeline
