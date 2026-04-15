@@ -89,7 +89,7 @@ def load_all_decades(decades, dir_emb):
 
 
 # =============================================================================
-# Analysis Functions (from bert_latinise.ipynb)
+# Analysis Functions 
 # =============================================================================
 
 def compute_average_embedding(embeddings):
@@ -127,28 +127,6 @@ def compute_cosine_similarity_across_decades(word, all_data, reference_decade=19
                 similarities[decade] = sim
     
     return similarities
-
-
-def compute_prt(similarities):
-    """Compute PRT (Procrustes-related transformation) from cosine similarities."""
-    prt = {}
-    for decade, sim in similarities.items():
-        prt[decade] = 1 / sim if sim != 0 else float('inf')
-    return prt
-
-
-def compute_apd(embeddings1, embeddings2):
-    """
-    Compute Average Pairwise Distance between two sets of embeddings
-    using Euclidean distance (sklearn.metrics.pairwise.euclidean_distances).
-    """
-    if len(embeddings1) == 0 or len(embeddings2) == 0:
-        return None
-    A = np.stack(embeddings1)
-    B = np.stack(embeddings2)
-    distances = euclidean_distances(A, B)  # (n1, n2)
-    return np.mean(distances)
-
 
 def optimal_num_clusters(embeddings, min_k=2, max_k=10, random_state=42):
     """
@@ -344,32 +322,7 @@ if __name__ == "__main__":
     print(f"\nSaved to {sim_csv}")
     
     # ==========================================================================
-    # 2. Compute PRT values
-    # ==========================================================================
-    print("\n" + "="*60)
-    print("2. PRT VALUES (higher = more change)")
-    print("="*60)
-    
-    all_prt = {}
-    for word in TARGET_WORDS:
-        prt = compute_prt(all_similarities[word])
-        all_prt[word] = prt
-        print(f"\n{word}:")
-        for decade, val in sorted(prt.items()):
-            print(f"  {decade}: {val:.4f}")
-    
-    # Save PRT to CSV
-    prt_csv = os.path.join(dir_out, "csv", "prt_values.csv")
-    with open(prt_csv, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Word", "Decade", "PRT"])
-        for word, prt_vals in all_prt.items():
-            for decade, val in sorted(prt_vals.items()):
-                writer.writerow([word, decade, val])
-    print(f"\nSaved PRT values to {prt_csv}")
-    
-    # ==========================================================================
-    # 3. Plot similarity over time
+    # 2. Plot similarity over time
     # ==========================================================================
     print("\n" + "="*60)
     print("3. PLOTTING SIMILARITY OVER TIME")
@@ -390,40 +343,7 @@ if __name__ == "__main__":
     plt.close()
     
     # ==========================================================================
-    # 4. APD between consecutive decades (Euclidean distance)
-    # ==========================================================================
-    print("\n" + "="*60)
-    print("4. APD BETWEEN CONSECUTIVE DECADES (Euclidean distance)")
-    print("="*60)
-    
-    apd_results = {word: {} for word in TARGET_WORDS}
-    
-    for word in TARGET_WORDS:
-        print(f"\n{word}:")
-        sorted_decades = sorted([d for d in all_data.keys() if word in all_data[d]])
-        
-        for i in range(len(sorted_decades) - 1):
-            d1, d2 = sorted_decades[i], sorted_decades[i+1]
-            emb1 = all_data[d1][word]['embeddings']
-            emb2 = all_data[d2][word]['embeddings']
-            
-            if len(emb1) > 0 and len(emb2) > 0:
-                apd = compute_apd(emb1, emb2)
-                apd_results[word][(d1, d2)] = apd
-                print(f"  {d1}-{d2}: APD = {apd:.4f}")
-    
-    # Save APD to CSV
-    apd_csv = os.path.join(dir_out, "csv", "apd_consecutive_decades.csv")
-    with open(apd_csv, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Word", "Decade_Start", "Decade_End", "APD"])
-        for word, apd_vals in apd_results.items():
-            for (d1, d2), apd in sorted(apd_vals.items()):
-                writer.writerow([word, d1, d2, apd])
-    print(f"\nSaved APD values to {apd_csv}")
-    
-    # ==========================================================================
-    # 5. Clustering analysis
+    # 3. Clustering analysis
     # ==========================================================================
     print("\n" + "="*60)
     print("5. CLUSTERING ANALYSIS")
@@ -468,7 +388,7 @@ if __name__ == "__main__":
     print(f"\nSaved clustering summary to {cluster_csv}")
     
     # ==========================================================================
-    # 6. Visualize embeddings across all decades
+    # 4. Visualize embeddings across all decades
     # ==========================================================================
     print("\n" + "="*60)
     print("6. CROSS-DECADE VISUALIZATION")
@@ -479,7 +399,7 @@ if __name__ == "__main__":
         plot_embeddings_across_decades(word, all_data, save_path=os.path.join(dir_out, "PCA"))
     
     # ==========================================================================
-    # 7. Get example snippets for each cluster
+    # 5. Get example snippets for each cluster
     # ==========================================================================
     print("\n" + "="*60)
     print("7. EXAMPLE SNIPPETS PER CLUSTER")
