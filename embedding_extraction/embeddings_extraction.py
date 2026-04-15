@@ -23,8 +23,8 @@ dir_corpus = os.path.join(dir_in, "en_decade_corpus")
 
 # Model selection based on argument
 if args.model == 'finetuned':
-    macberth_model = os.path.join(dir_in, "output", "fine_tuned_macberth_hmd_full_corpus")
-    dir_out = os.path.join(dir_in, "output", "embeddings_macberth_finetuned_new")
+    macberth_model = os.path.join(dir_in, "output", "fine_tuned_macberth")
+    dir_out = os.path.join(dir_in, "output", "embeddings_macberth_finetuned")
     print(f"Using FINE-TUNED MacBERTh model")
 else:
     macberth_model = "emanjavacas/MacBERTh"
