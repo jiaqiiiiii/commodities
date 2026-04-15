@@ -128,28 +128,6 @@ def compute_cosine_similarity_across_decades(word, all_data, reference_decade=19
     
     return similarities
 
-
-def compute_prt(similarities):
-    """Compute PRT (Procrustes-related transformation) from cosine similarities."""
-    prt = {}
-    for decade, sim in similarities.items():
-        prt[decade] = 1 / sim if sim != 0 else float('inf')
-    return prt
-
-
-def compute_apd(embeddings1, embeddings2):
-    """
-    Compute Average Pairwise Distance between two sets of embeddings
-    using Euclidean distance (sklearn.metrics.pairwise.euclidean_distances).
-    """
-    if len(embeddings1) == 0 or len(embeddings2) == 0:
-        return None
-    A = np.stack(embeddings1)
-    B = np.stack(embeddings2)
-    distances = euclidean_distances(A, B)  # (n1, n2)
-    return np.mean(distances)
-
-
 def optimal_num_clusters(embeddings, min_k=2, max_k=10, random_state=42):
     """
     Find optimal number of clusters using silhouette score.
