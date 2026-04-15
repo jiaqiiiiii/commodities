@@ -100,34 +100,6 @@ def compute_average_embedding(embeddings):
     avg = np.mean(embeddings_array, axis=0)
     return normalize(avg.reshape(1, -1))[0]
 
-
-def compute_cosine_similarity_across_decades(word, all_data, reference_decade=1910):
-    """
-    Compute cosine similarity between a word's embedding in each decade 
-    vs the reference decade (default: 1910).
-    """
-    if reference_decade not in all_data:
-        print(f"Reference decade {reference_decade} not found")
-        return {}
-    
-    if word not in all_data[reference_decade]:
-        print(f"Word '{word}' not found in {reference_decade}")
-        return {}
-    
-    ref_avg = compute_average_embedding(all_data[reference_decade][word]['embeddings'])
-    if ref_avg is None:
-        return {}
-    
-    similarities = {}
-    for decade in sorted(all_data.keys()):
-        if word in all_data[decade]:
-            decade_avg = compute_average_embedding(all_data[decade][word]['embeddings'])
-            if decade_avg is not None:
-                sim = cosine_similarity(ref_avg.reshape(1, -1), decade_avg.reshape(1, -1))[0][0]
-                similarities[decade] = sim
-    
-    return similarities
-
 def optimal_num_clusters(embeddings, min_k=2, max_k=10, random_state=42):
     """
     Find optimal number of clusters using silhouette score.
@@ -297,53 +269,7 @@ if __name__ == "__main__":
     print(f"\nLoaded {len(all_data)} decades")
     
     # ==========================================================================
-    # 1. Compute cosine similarities across decades (vs 1910)
-    # ==========================================================================
-    print("\n" + "="*60)
-    print("1. COSINE SIMILARITY ACROSS DECADES (vs 1910)")
-    print("="*60)
-    
-    all_similarities = {}
-    for word in TARGET_WORDS:
-        sims = compute_cosine_similarity_across_decades(word, all_data, reference_decade=1910)
-        all_similarities[word] = sims
-        print(f"\n{word}:")
-        for decade, sim in sorted(sims.items()):
-            print(f"  {decade}: {sim:.4f}")
-    
-    # Save to CSV
-    sim_csv = os.path.join(dir_out, "csv", "cosine_similarities_vs_1910.csv")
-    with open(sim_csv, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Word", "Decade", "Cosine Similarity"])
-        for word, sims in all_similarities.items():
-            for decade, sim in sorted(sims.items()):
-                writer.writerow([word, decade, sim])
-    print(f"\nSaved to {sim_csv}")
-    
-    # ==========================================================================
-    # 2. Plot similarity over time
-    # ==========================================================================
-    print("\n" + "="*60)
-    print("3. PLOTTING SIMILARITY OVER TIME")
-    print("="*60)
-    
-    plt.figure(figsize=(12, 6))
-    for word in TARGET_WORDS:
-        decades_sorted = sorted(all_similarities[word].keys())
-        sims = [all_similarities[word][d] for d in decades_sorted]
-        plt.plot(decades_sorted, sims, marker='o', label=word)
-    
-    plt.xlabel("Decade")
-    plt.ylabel("Cosine Similarity (vs 1910)")
-    plt.title("Semantic Stability Over Time")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(dir_out, "PCA", "similarity_over_time.png"), dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    # ==========================================================================
-    # 3. Clustering analysis
+    # 1. Clustering analysis
     # ==========================================================================
     print("\n" + "="*60)
     print("5. CLUSTERING ANALYSIS")
@@ -388,7 +314,7 @@ if __name__ == "__main__":
     print(f"\nSaved clustering summary to {cluster_csv}")
     
     # ==========================================================================
-    # 4. Visualize embeddings across all decades
+    # 2. Visualize embeddings across all decades
     # ==========================================================================
     print("\n" + "="*60)
     print("6. CROSS-DECADE VISUALIZATION")
@@ -399,7 +325,7 @@ if __name__ == "__main__":
         plot_embeddings_across_decades(word, all_data, save_path=os.path.join(dir_out, "PCA"))
     
     # ==========================================================================
-    # 5. Get example snippets for each cluster
+    # 3. Get example snippets for each cluster
     # ==========================================================================
     print("\n" + "="*60)
     print("7. EXAMPLE SNIPPETS PER CLUSTER")
