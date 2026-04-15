@@ -370,34 +370,7 @@ def generate_report(stats: dict, output_path: Path):
     
     lines.append("-" * 80)
     lines.append(f"{'TOTAL':<10} {total_articles:>12,} {total_tokens:>15,} {total_bytes/1024/1024:>12.1f}")
-    
-    # Word2Vec recommendations
-    lines.append("\n" + "=" * 80)
-    lines.append("WORD2VEC TRAINING RECOMMENDATIONS")
-    lines.append("=" * 80)
-    
-    for start, _ in DECADES:
-        decade = f"{start}s"
-        tokens = stats['tokens_by_decade'].get(decade, 0)
-        
-        if tokens >= 50_000_000:
-            status = "✓ Excellent"
-            rec = "vector_size=300, min_count=100"
-        elif tokens >= 10_000_000:
-            status = "✓ Good"
-            rec = "vector_size=300, min_count=50"
-        elif tokens >= 5_000_000:
-            status = "◐ Adequate"
-            rec = "vector_size=200, min_count=30"
-        elif tokens >= 1_000_000:
-            status = "⚠ Sparse"
-            rec = "vector_size=100, min_count=20"
-        else:
-            status = "✗ Insufficient"
-            rec = "Consider merging with adjacent decade"
-        
-        lines.append(f"{decade}: {tokens:>12,} tokens → {status} | {rec}")
-    
+
     # Top newspapers
     lines.append("\n" + "=" * 80)
     lines.append("TOP 20 NEWSPAPERS BY ARTICLE COUNT")
