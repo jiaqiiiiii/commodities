@@ -142,7 +142,7 @@ for epoch in range(epochs):
     model.train()
 
 # Save Fine-Tuned Model
-output_model_path = os.path.join(dir_out, "fine_tuned_macberth_hmd")
+output_model_path = os.path.join(dir_out, "fine_tuned_macberth")
 model.save_pretrained(output_model_path)
 tokenizer.save_pretrained(output_model_path)
 print(f"Fine-tuning complete! Model saved to {output_model_path}")
