@@ -1,50 +1,34 @@
-# Diachronic Word Embedding Analysis Tools
+# Static Embeddings Analysis
 
-Tools for analyzing semantic change using Word2Vec embeddings trained on historical text corpora. Originally developed for studying colonial commodity terms in 19th-century British newspapers.
+This directory contains the static Word2Vec analysis pipeline, addressing **RQ1: did the dominant usages of commodity terms shift across the decades?** It uses pretrained, decade-aligned Word2Vec vectors from [Pedrazzini & McGillivray (2022)](https://aclanthology.org/2022.nlp4dh-1.11/) to compute cosine similarity trajectories, extract nearest neighbours, and produce t-SNE visualisations of semantic change.
 
-## Overview
+This corresponds to **Section 4.1** in the paper and produces **Figure 4** (cosine similarity), **Table 2** (nearest neighbours), and **Figures 5–7** (t-SNE trajectories).
 
-This repository provides two complementary scripts:
+## Files
 
-1. **`extract_neighbors.py`** — Extract nearest neighbors and vocabulary statistics across time periods
-2. **`visualize_semantic_trajectory.py`** — Visualize semantic change trajectories using t-SNE
+| File | Description | Paper element |
+|---|---|---|
+| `extract_neighbors.py` | Extract nearest neighbours and vocabulary statistics for target words across all decades. Computes top-N neighbours by cosine similarity, tracks vocabulary rank, and analyses stable vs. new vs. lost neighbours over time | Table 2 |
+| `visualize_semantic_trajectory.py` | t-SNE visualisation of semantic change trajectories. Projects target word vectors and their neighbours into a shared 2D space, with trajectory arrows showing the direction of semantic movement | Figures 5, 6, 7 |
 
-Together, these tools enable quantitative and visual analysis of how word meanings shift over time.
+**Note:** Cosine similarity vs. the 1910s reference decade (Figure 4) can be computed from the same vectors using the neighbour extraction script's output or directly from the loaded models. See usage examples below.
 
-## Requirements
+## Pretrained Word2Vec Vectors
 
-```bash
-# Core dependencies
-pip install numpy pandas matplotlib scikit-learn gensim tqdm
+We use pretrained, decade-aligned diachronic embeddings from:
 
-# Optional but recommended
-pip install adjustText      # Prevents text label overlap in visualizations
-pip install pyspellchecker  # Filters OCR errors from historical texts
-```
+> Nilo Pedrazzini and Barbara McGillivray (2022). *Diachronic word embeddings from 19th-century British newspapers* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7181682
 
-## Input Data
+These vectors were trained on the HMD and LwM newspaper corpus (~4.2 billion tokens) with skip-gram architecture, 5 epochs, 200 dimensions, context window of 3, minimum word count of 1. Decade-specific vector spaces were aligned using Orthogonal Procrustes (Schönemann, 1966).
 
-Both scripts expect Word2Vec models in text or binary format, organized by time period.
-
-### Pre-trained Embeddings (Recommended)
-
-We used pre-trained, pre-aligned diachronic embeddings from the Living with Machines project:
-
-**Download:** https://zenodo.org/records/7181682
-
-These embeddings were trained on a 4.2 billion word corpus of 19th-century British newspapers, divided by decade and aligned using Orthogonal Procrustes.
+**Download and extract:**
 
 ```bash
-# Download and extract
 wget https://zenodo.org/records/7181682/files/lwm_vectors.zip
 unzip lwm_vectors.zip -d vectors/
 ```
 
-**If you use these embeddings, you must cite:**
-
-> Pedrazzini, Nilo & Barbara McGillivray. 2022. *Diachronic word embeddings from 19th-century British newspapers* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7181682
-
-### Expected folder structure
+**Expected structure:**
 
 ```
 vectors/
@@ -58,239 +42,113 @@ vectors/
 └── 1910s-vectors.txt
 ```
 
-### Supported formats
-- Word2Vec text format (`*.txt`, `*-vectors.txt`)
-- Word2Vec binary format (`*.bin`)
-- FastText vectors (`*.vec`)
+Supported formats: Word2Vec text (`*.txt`), binary (`*.bin`), or FastText (`*.vec`).
 
----
+## Usage
 
-## Script 1: Extract Neighbors
-
-`extract_neighbors.py` extracts nearest neighbors for target words across all time periods.
-
-### Features
-
-- Extracts top-N nearest neighbors per decade
-- Computes vocabulary rank (proxy for word frequency)
-- Handles OCR/spelling variations
-- Analyzes stable vs. new vs. lost neighbors over time
-
-### Usage
+### Extract nearest neighbours (Table 2)
 
 ```bash
-# Single word
-python extract_neighbors.py --word coffee --vectors_dir ./vectors --output_dir ./output
+# All six commodity terms
+python extract_neighbors.py --all-commodities --vectors_dir ./vectors --output_dir ./output
 
-# Multiple words
-python extract_neighbors.py --words coffee tea sugar --vectors_dir ./vectors
+# Single word with custom parameters
+python extract_neighbors.py --word coffee --vectors_dir ./vectors --topn 50
 
-# All example commodities
-python extract_neighbors.py --all-commodities --vectors_dir ./vectors
-
-# Custom parameters
-python extract_neighbors.py --word opium --topn 50 --decades 1840s 1860s 1880s 1900s
-
-# Add spelling variant for noisy OCR text
+# With OCR spelling variants
 python extract_neighbors.py --word coffee --add-variant coffee coffe --add-variant coffee coffée
 ```
 
-### Output files
+**Output files:**
 
-```
-output/
-├── word_frequencies.csv          # Vocabulary ranks per decade
-├── word_frequencies_wide.csv     # Ranks in wide format (decades as columns)
-├── all_neighbors.csv             # All neighbors for all words
-├── neighbors_{word}.csv          # Neighbors for specific word
-├── neighbors_{word}_wide.csv     # Wide format (decades as columns)
-└── neighbor_changes_summary.csv  # Stable/new/lost neighbor analysis
-```
+| File | Description |
+|---|---|
+| `neighbors_{word}.csv` | All neighbours per decade for a specific word |
+| `neighbors_{word}_wide.csv` | Wide format with decades as columns (directly corresponds to Table 2) |
+| `all_neighbors.csv` | Combined neighbours for all target words |
+| `neighbor_changes_summary.csv` | Stable/new/lost neighbour analysis across decades |
+| `word_frequencies.csv` | Vocabulary rank per decade (proxy for frequency) |
 
-### Example output: `neighbors_coffee_wide.csv`
-
-| rank | 1840s | 1850s | 1860s | 1870s | 1880s |
-|------|-------|-------|-------|-------|-------|
-| 1 | tea | tea | tea | tea | tea |
-| 2 | sugar | sugar | cocoa | cocoa | cocoa |
-| 3 | spices | cocoa | sugar | chocolate | temperance |
-| ... | ... | ... | ... | ... | ... |
-
----
-
-## Script 2: Visualize Semantic Trajectory
-
-`visualize_semantic_trajectory.py` creates t-SNE visualizations showing how words move through semantic space over time.
-
-### Features
-
-- Applies t-SNE to project embeddings to 2D
-- Shows trajectory arrows between time periods
-- Colors neighbors by the decade they appear in
-- Optional OCR error filtering
-
-### Usage
+### Visualise semantic trajectories (Figures 5–7)
 
 ```bash
-# Single word
-python visualize_semantic_trajectory.py --word coffee --vectors_dir ./vectors --output_dir ./output
-
-# Multiple words
-python visualize_semantic_trajectory.py --words coffee tea sugar opium
-
 # All commodities
-python visualize_semantic_trajectory.py --all-commodities --vectors_dir ./vectors
+python visualize_semantic_trajectory.py --all-commodities --vectors_dir ./vectors --output_dir ./output
 
-# Fewer time points for cleaner visualization
+# Single word
+python visualize_semantic_trajectory.py --word coffee --vectors_dir ./vectors
+
+# Specific decades
 python visualize_semantic_trajectory.py --word tea --decades 1840s 1870s 1900s
-
-# More neighbors, no OCR filtering
-python visualize_semantic_trajectory.py --word sugar --topn 30 --no-filter-ocr
 ```
 
-### Output files
+**Output files:**
 
-```
-output/
-├── trajectory_coffee.png    # Visualization
-├── neighbors_coffee.csv     # Neighbor data used in plot
-├── trajectory_tea.png
-├── neighbors_tea.csv
-└── ...
-```
+| File | Description |
+|---|---|
+| `trajectory_{word}.png` | t-SNE visualisation (Figures 5–7 in the paper) |
+| `neighbors_{word}.csv` | Neighbour data used in the plot |
 
-### Interpreting the visualization
+### Interpreting the t-SNE visualisations
 
-- **Large colored dots**: Position of target word at each decade
-- **Arrows**: Direction of semantic movement over time
-- **Small dots**: Nearest neighbors, colored by decade of appearance
-- **Dark gray dots**: "Stable" neighbors appearing across all decades
-- **Trajectory pattern**: Long arrows = major semantic shift; clustering = stable meaning
+- **Large coloured dots**: position of the target word at each decade
+- **Arrows**: direction of semantic movement between consecutive decades
+- **Small dots**: nearest neighbours, coloured by the decade in which they appear
+- **Dark grey dots**: "stable" neighbours appearing across all decades
+- Long arrows indicate major semantic shift; tight clustering indicates stable meaning
 
----
+## Handling OCR Errors
 
-## Complete Workflow Example
-
-```bash
-# 1. Extract neighbors for analysis
-python extract_neighbors.py \
-    --all-commodities \
-    --vectors_dir ./lwm_vectors \
-    --output_dir ./neighbor_analysis \
-    --topn 100
-
-# 2. Create trajectory visualizations
-python visualize_semantic_trajectory.py \
-    --all-commodities \
-    --vectors_dir ./lwm_vectors \
-    --output_dir ./trajectory_plots \
-    --decades 1840s 1850s 1860s 1870s 1880s 1890s 1900s 1910s
-
-# 3. Examine results
-ls ./neighbor_analysis/
-ls ./trajectory_plots/
-```
-
----
-
-## Customization
-
-### Adding new target words
-
-Both scripts accept any word via `--word` or `--words`:
-
-```bash
-python extract_neighbors.py --words railway steam telegraph --vectors_dir ./vectors
-```
-
-### Handling OCR errors / spelling variations
-
-For historical corpora with OCR noise, you can specify spelling variants:
+Historical newspaper corpora contain OCR noise. The scripts support spelling variant specification:
 
 ```bash
 python extract_neighbors.py \
     --word coffee \
     --add-variant coffee coffe \
-    --add-variant coffee coffce \
-    --add-variant coffee eoffee
+    --add-variant coffee coffce
 ```
 
 Or modify the `TARGET_VARIANTS` dictionary in the script:
 
 ```python
 TARGET_VARIANTS = {
-    'coffee': ['coffee', 'coffe', 'coffce', 'eoffee'],
-    'theatre': ['theatre', 'theater', 'tbeatre'],
-    # ... add your own
+    'coffee': ['coffee', 'coffe', 'coffce'],
+    'tea': ['tea', 'tee'],
+    # add your own
 }
 ```
 
-### Different time periods
-
-Both scripts support custom decade lists:
-
-```bash
-# 20th century analysis
-python extract_neighbors.py --word computer --decades 1950s 1960s 1970s 1980s 1990s 2000s
-
-# Finer granularity (if you have per-year models)
-python visualize_semantic_trajectory.py --word war --decades 1914 1915 1916 1917 1918
-```
-
----
+The visualisation script also supports OCR filtering of neighbours (`--no-filter-ocr` to disable).
 
 ## Methodology
 
-### Nearest Neighbor Extraction
-
-1. Load Word2Vec models for each time period
+**Nearest Neighbour Extraction:**
+1. Load aligned Word2Vec models for each decade
 2. For each target word, find top-N most similar words by cosine similarity
 3. Track vocabulary rank as proxy for frequency
-4. Compare neighbor sets across time to identify semantic stability/change
+4. Compare neighbour sets across decades to identify semantic stability and change
 
-### Trajectory Visualization
+**Trajectory Visualisation:**
+1. Collect vectors for the target word across all decades
+2. Collect vectors for all unique neighbours (using the 1910s model as reference)
+3. Filter likely OCR errors, retaining only recognised English words
+4. Apply t-SNE dimensionality reduction (2 components, Euclidean distance)
+5. Plot neighbours coloured by decade, with trajectory arrows for the target word
 
-1. Collect vectors for target word at each time point
-2. Collect vectors for all unique neighbors (using final decade as reference)
-3. Apply t-SNE dimensionality reduction
-4. Plot neighbors colored by decade, with trajectory arrows for target word
-
-### Limitations
-
+**Limitations:**
 - t-SNE is stochastic; results may vary between runs (use `--random_state` for reproducibility)
 - Embedding alignment assumes comparable training corpora across periods
-- Neighbor quality depends on embedding quality and corpus size
+- Neighbour quality depends on embedding quality and corpus size per decade
 
----
+## Relationship to the paper
 
-## Citation
+| Paper element | Produced by | Key finding |
+|---|---|---|
+| Figure 4 (cosine similarity) | Computed from loaded Word2Vec models | Coffee, tea, sugar show clear drift toward 1910s sense; opium relatively stable |
+| Table 2 (nearest neighbours) | `extract_neighbors.py` | Coffee shifts from *sugar, tobacco, cocoa* (1850s) to *sandwiches, porridge, muffins* (1910s) |
+| Figures 5–7 (t-SNE) | `visualize_semantic_trajectory.py` | Spatial separation between early trade neighbourhood and late culinary neighbourhood |
 
-If you use these tools in your research, please cite:
+## Acknowledgements
 
-### Pre-trained embeddings (required if using Zenodo data)
-
-```bibtex
-@dataset{pedrazzinimcgilli_diachemb19data,
-  author       = {Nilo Pedrazzini and
-                  Barbara McGillivray},
-  title        = {{Diachronic word embeddings from 19th-century 
-                   British newspapers}},
-  year         = 2022,
-  publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.7181682},
-  url          = {https://doi.org/10.5281/zenodo.7181682}
-}
-```
-
-## Related Work
-
-- [Living with Machines](https://livingwithmachines.ac.uk/) — Historical NLP project
-- [DiachronicEmb-BigHistData](https://github.com/Living-with-machines/DiachronicEmb-BigHistData) — Original codebase this work adapts
-- [HistWords](https://nlp.stanford.edu/projects/histwords/) — Hamilton et al.'s diachronic word embeddings
-- [SemEval-2020 Task 1](https://www.aclweb.org/anthology/2020.semeval-1.1/) — Unsupervised Lexical Semantic Change Detection
-
-## Acknowledgments
-
-- Pre-trained embeddings by [Pedrazzini & McGillivray (2022)](https://zenodo.org/records/7181682)
+- Pretrained vectors by [Pedrazzini & McGillivray (2022)](https://zenodo.org/records/7181682)
 - Code adapted from [Living with Machines: DiachronicEmb-BigHistData](https://github.com/Living-with-machines/DiachronicEmb-BigHistData)
-- Developed as part of the TRIFECTA project at KNAW Humanities Cluster
