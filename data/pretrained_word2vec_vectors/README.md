@@ -7,3 +7,7 @@ Nilo Pedrazzini, & Barbara McGillivray. (2022). Diachronic word embeddings from 
 These vectors were trained on the same HMD and LwM data with the following hyperparameters: skip-gram architecture, 5 epochs, 200 dimensions, context window of 3, minimum word count of 1. Decade-specific vector spaces were aligned using Orthogonal Procrustes (Schönemann, 1966).
 
 We do not redistribute these vectors. Please download these vectors from Zenodo: https://zenodo.org/records/7181682. 
+
+## Check the shared vocabulary 
+
+After downloading the vectors from Zenodo, you can run shared_vocab.py to see the shared vocabulary of these vectors, which will give you shared_vocab_output.txt as result. 
