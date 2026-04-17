@@ -10,4 +10,4 @@ We do not redistribute these vectors. Please download these vectors from Zenodo:
 
 ## Check the shared vocabulary 
 
-After downloading the vectors from Zenodo, you can run shared_vocab.py to see the shared vocabulary of these vectors, which will give you shared_vocab_output.txt as result. 
+After downloading the vectors from Zenodo, you can run `shared_vocab.py` to see the shared vocabulary of these vectors, which will give you `shared_vocab_output.txt` as result. 
