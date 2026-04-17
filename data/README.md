@@ -22,7 +22,7 @@ data/
 │   ├── en_1910s.txt
 │   ├── aggregation_report.txt
 │   └── aggregation_stats.json
-└── word2vec_vectors/          # Downloaded — see instructions below
+└── pretrained_word2vec_vectors/          # Downloaded — see instructions below
 ```
 
 ## Source Corpora
