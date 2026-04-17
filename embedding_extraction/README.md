@@ -4,6 +4,8 @@ This directory contains the pipeline for extracting contextualised embeddings fr
 
 This is the core analytical pipeline of the paper, producing the data behind Tables 3, 4, 5–10, and Figures 8 and 9.
 
+The directory follows scripts in the [LatinISE project](https://github.com/BarbaraMcG/latinise/tree/master/christianity_semantic_change) and also [Andrey Kutuzov and Mario Giulianelli's participation in SemEval 2020 Task 1: Unsupervised Lexical Semantic Change Detection](https://github.com/akutuzov/semeval2020/tree/master) .
+
 ## Directory Structure
 
 ```
