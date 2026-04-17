@@ -128,6 +128,6 @@ tokenizer = AutoTokenizer.from_pretrained("path/to/output/fine_tuned_macberth")
 
 ## Relationship to the paper
 
-- **Section 4.2** (Model Fine-tuning for Domain Adaptation) describes the grid search procedure, the 1% subcorpus rationale (citing Klein et al. 2017), and the winning configuration
+- **Section 4.2** (Model Fine-tuning for Domain Adaptation) describes the grid search procedure, the 1% subcorpus rationale, and the winning configuration
 - **Section 7** (Limitations — Model Configuration) acknowledges that the 1% subcorpus grid search is a trade-off and that configurations optimal for a smaller sample may not generalise perfectly to the full data
 - **Appendix** (Domain-Adaptation Evaluation) compares PCA projections and clustering outcomes between the pretrained and domain-adapted models (see `domain_adaptation_evaluation/`)
