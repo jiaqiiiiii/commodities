@@ -5,8 +5,8 @@ Find the shared vocabulary across all decade vector files.
 import os
 import sys
 
-VECTOR_DIR = "/data/groups/trifecta/jiaqiz/lwm_vectors" 
-DECADES = ["1840s", "1850s", "1860s", "1870s", "1880s", "1890s", "1900s", "1910s"]
+VECTOR_DIR = ".../lwm_vectors" # change it to your filepath
+DECADES = ["1840s", "1850s", "1860s", "1870s", "1880s", "1890s", "1900s", "1910s"] # change it as you need
 
 def load_vocab(filepath):
     """Read vocabulary from a word2vec text-format file."""
